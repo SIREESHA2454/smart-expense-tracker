@@ -1,0 +1,19 @@
+# Dependencies (huge folders, never push these)
+node_modules/
+
+# Environment variables (contain secrets like passwords — NEVER commit these)
+.env
+.env.local
+.env.production
+
+# Build output
+/client/build
+/client/dist
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
