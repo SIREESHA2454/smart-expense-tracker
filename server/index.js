@@ -36,16 +36,17 @@ app.use('/api/expenses', expenseRoutes);
 
 // 4. Static files + React catch-all LAST
 if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.resolve(__dirname, '..', 'client', 'dist');
+  // Now pointing to server/public — simple and reliable
+  const clientBuildPath = path.join(__dirname, 'public');
 
-  // Serve static assets (JS, CSS, images)
+  console.log('Serving static from:', clientBuildPath);
+
   app.use(express.static(clientBuildPath));
 
-  // All non-API routes → React app
   app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
-} else {
+}else {
   app.get('/', (req, res) => {
     res.json({ message: 'Smart Expense Tracker API is running ✅' });
   });

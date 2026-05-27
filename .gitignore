@@ -13,7 +13,7 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
-
+server/public
 # Logs
 *.log
 npm-debug.log*
