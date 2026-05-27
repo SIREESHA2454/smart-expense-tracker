@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: smart-expense-tracker
+    env: node
+    region: singapore  # closest to India
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false  # we'll set this manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false  # we'll set this manually in Render dashboard
+      - key: PORT
+        value: 10000  # Render's default port
