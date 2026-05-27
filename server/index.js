@@ -1,7 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const path = require('path');
 const connectDB = require('./config/db');
 
 dotenv.config();
@@ -9,10 +8,10 @@ connectDB();
 
 const app = express();
 
-// 1. Body parsing middleware
+// Body parser
 app.use(express.json());
 
-// 2. CORS
+// CORS
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
@@ -22,37 +21,30 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
 
-// 3. API routes FIRST — before static files
-const authRoutes    = require('./routes/authRoutes');
+// Routes
+const authRoutes = require('./routes/authRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
-app.use('/api/auth',     authRoutes);
+
+app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRoutes);
 
-// 4. Static files + React catch-all LAST
-if (process.env.NODE_ENV === 'production') {
-  // Now pointing to server/public — simple and reliable
-  const clientBuildPath = path.join(__dirname, 'public');
-
-  console.log('Serving static from:', clientBuildPath);
-
-  app.use(express.static(clientBuildPath));
-
-  app.get('/{*path}', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
-}else {
-  app.get('/', (req, res) => {
-    res.json({ message: 'Smart Expense Tracker API is running ✅' });
-  });
-}
+// Test route
+app.get('/', (req, res) => {
+  res.json({ message: 'Expense Tracker API Running ✅' });
+});
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
