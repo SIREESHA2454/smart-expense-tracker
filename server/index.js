@@ -40,6 +40,21 @@ const expenseRoutes = require('./routes/expenseRoutes');
 app.use('/api/auth',     authRoutes);
 app.use('/api/expenses', expenseRoutes);
 
+
+// TEMPORARY DEBUG ROUTE - we'll remove after fixing
+app.get('/debug-path', (req, res) => {
+  const fs = require('fs');
+  const p1 = path.resolve(__dirname, '..', 'client', 'dist');
+  const p2 = path.resolve(__dirname, 'client', 'dist');
+  res.json({
+    __dirname,
+    p1_exists: fs.existsSync(p1),
+    p2_exists: fs.existsSync(p2),
+    p1,
+    p2,
+  });
+});
+
 // ─── Serve React Build in Production ─────────────────────────────────────────
 if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.resolve(__dirname, '..', 'client', 'dist');
