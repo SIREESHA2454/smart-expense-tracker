@@ -4,28 +4,23 @@ const cors = require('cors');
 const path = require('path');
 const connectDB = require('./config/db');
 
-// Load env variables first
 dotenv.config();
-
-// Connect to database
 connectDB();
 
 const app = express();
 
-// ─── Middleware ────────────────────────────────────────────────────────────────
+// 1. Body parsing middleware
 app.use(express.json());
 
-// CORS — in production the frontend is served by Express itself
-// so we only need CORS for local development
+// 2. CORS
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
-  process.env.CLIENT_URL, // we'll set this on Render
+  process.env.CLIENT_URL,
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman, curl)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
@@ -33,54 +28,29 @@ app.use(cors({
   credentials: true,
 }));
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
+// 3. API routes FIRST — before static files
 const authRoutes    = require('./routes/authRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
-
 app.use('/api/auth',     authRoutes);
 app.use('/api/expenses', expenseRoutes);
 
-
-// TEMPORARY DEBUG ROUTE - we'll remove after fixing
-app.get('/debug-path', (req, res) => {
-  const fs = require('fs');
-  const p1 = path.resolve(__dirname, '..', 'client', 'dist');
-  const p2 = path.resolve(__dirname, 'client', 'dist');
-  res.json({
-    __dirname,
-    p1_exists: fs.existsSync(p1),
-    p2_exists: fs.existsSync(p2),
-    p1,
-    p2,
-  });
-});
-
-// ─── Serve React Build in Production ─────────────────────────────────────────
+// 4. Static files + React catch-all LAST
 if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.resolve(__dirname, '..', 'client', 'dist');
 
-  // Log the path so we can verify it in Render logs
-  console.log('Serving static files from:', clientBuildPath);
-
+  // Serve static assets (JS, CSS, images)
   app.use(express.static(clientBuildPath));
 
+  // All non-API routes → React app
   app.get('/{*path}', (req, res) => {
-    res.sendFile(
-      path.join(clientBuildPath, 'index.html'),
-      (err) => {
-        if (err) {
-          console.error('sendFile error:', err);
-          res.status(500).json({ message: 'Could not load app' });
-        }
-      }
-    );
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
 } else {
   app.get('/', (req, res) => {
     res.json({ message: 'Smart Expense Tracker API is running ✅' });
   });
 }
-// ─── Start Server ─────────────────────────────────────────────────────────────
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
