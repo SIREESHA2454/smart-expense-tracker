@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
 
 // Load environment variables FIRST, before anything else
 dotenv.config();
@@ -23,6 +24,11 @@ app.use(cors({
 }));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ message: 'Smart Expense Tracker API is running ✅' });
+});
+
+app.use('/api/auth', authRoutes);
 
 // Health check route - useful to verify the server is running
 app.get('/', (req, res) => {
