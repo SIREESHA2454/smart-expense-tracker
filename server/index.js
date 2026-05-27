@@ -42,22 +42,29 @@ app.use('/api/expenses', expenseRoutes);
 
 // ─── Serve React Build in Production ─────────────────────────────────────────
 if (process.env.NODE_ENV === 'production') {
-  // Tell Express where the built React files are
-  const clientBuildPath = path.join(__dirname, '../client/dist');
+  const clientBuildPath = path.resolve(__dirname, '..', 'client', 'dist');
+
+  // Log the path so we can verify it in Render logs
+  console.log('Serving static files from:', clientBuildPath);
+
   app.use(express.static(clientBuildPath));
 
-  // For ANY route that isn't an API route, serve the React app
-  // This is what makes React Router work on refresh in production
-  // NEW — works in Express 5 (Node 24)
-app.get('/{*path}', (req, res) => {
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
-});
+  app.get('/{*path}', (req, res) => {
+    res.sendFile(
+      path.join(clientBuildPath, 'index.html'),
+      (err) => {
+        if (err) {
+          console.error('sendFile error:', err);
+          res.status(500).json({ message: 'Could not load app' });
+        }
+      }
+    );
+  });
 } else {
   app.get('/', (req, res) => {
     res.json({ message: 'Smart Expense Tracker API is running ✅' });
   });
 }
-
 // ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
