@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -22,6 +23,12 @@ function App() {
 <Route path="/dashboard" element={
   <PrivateRoute>
     <Dashboard />
+  </PrivateRoute>
+} />
+
+<Route path="/analytics" element={
+  <PrivateRoute>
+    <Analytics />
   </PrivateRoute>
 } />
 
