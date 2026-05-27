@@ -48,9 +48,10 @@ if (process.env.NODE_ENV === 'production') {
 
   // For ANY route that isn't an API route, serve the React app
   // This is what makes React Router work on refresh in production
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
+  // NEW — works in Express 5 (Node 24)
+app.get('/{*path}', (req, res) => {
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
 } else {
   app.get('/', (req, res) => {
     res.json({ message: 'Smart Expense Tracker API is running ✅' });
