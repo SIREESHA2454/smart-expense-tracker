@@ -11,23 +11,21 @@ const app = express();
 // Body parser
 app.use(express.json());
 
-
-
 // CORS
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
+  'https://expense-tracker-client-dinz.onrender.com',  // ← hardcoded as fallback
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-
+    console.log('Blocked by CORS:', origin); // helpful for debugging
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
@@ -46,7 +44,7 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('Allowed origins:', allowedOrigins); // confirm on startup
 });
