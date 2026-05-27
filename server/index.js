@@ -11,6 +11,8 @@ const app = express();
 // Body parser
 app.use(express.json());
 
+
+
 // CORS
 const allowedOrigins = [
   'http://localhost:5173',
